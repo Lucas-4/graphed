@@ -15,25 +15,29 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package com.graph.screens;
+package com.graphed.screens;
 
-import com.graph.graphview.GraphView;
+import com.graphed.graphview.GraphView;
+import com.graphed.graphview.search.DFS;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
 
 public class Main extends GridPane {
     private GraphView graphView;
@@ -44,11 +48,12 @@ public class Main extends GridPane {
     private ObservableList<String> edgeList;
     private ListView<String> edgeListView;
 
-    private VBox controlBox = new VBox();
+    private VBox leftBox = new VBox();
     private Button addVertexBtn = new Button("Add Vertex");
     private Button removeVertexBtn = new Button("Remove Vertex");
     private Button addEdgeBtn = new Button("Add Edge");
     private Button removeEdgeBtn = new Button("Remove Edge");
+
     private HBox edgeData = new HBox();
     private HBox edgeBtns = new HBox();
     private HBox vertexBtns = new HBox();
@@ -57,8 +62,20 @@ public class Main extends GridPane {
     private TextField weightTF = new TextField();
     private boolean isDirected;
     private boolean isWeighted;
+    private Button layout = new Button();
+    private Button displayId = new Button("D");
+    private Button dfs = new Button("DFS");
+    private VBox graphToolBar = new VBox();
 
-    public Main(boolean isDirected, boolean isWeighted) {
+    private VBox rightBox = new VBox();
+    private ScrollPane graphDataSP = new ScrollPane();
+    private Label numVerticesL = new Label("Number of vertices: 0");
+    private Label numEdgesL = new Label("Number of edges: 0");
+    private VBox graphData = new VBox();
+
+    public Main(
+            boolean isDirected,
+            boolean isWeighted) {
         this.isDirected = isDirected;
         this.isWeighted = isWeighted;
 
@@ -85,19 +102,41 @@ public class Main extends GridPane {
         edgeBtns.setSpacing(10);
         edgeBtns.getChildren().addAll(addEdgeBtn, removeEdgeBtn);
 
-        controlBox.setAlignment(Pos.CENTER);
-        controlBox.setSpacing(12);
-        controlBox.getChildren().addAll(vertexListView, vertexBtns, edgeListView, edgeData,
+        leftBox.setAlignment(Pos.CENTER);
+        leftBox.setSpacing(12);
+        leftBox.getChildren().addAll(vertexListView, vertexBtns, edgeListView, edgeData,
                 edgeBtns);
-        controlBox.setPrefWidth(200);
+        leftBox.setPrefWidth(200);
+        Image img = new Image(Main.class.getResource("/images/chart-simple-solid.png").toExternalForm());
+        ImageView view = new ImageView(img);
+        view.setFitWidth(20);
+        view.setPreserveRatio(true);
+        this.layout.setGraphic(view);
+        graphToolBar.getChildren().addAll(layout, displayId, dfs);
+        graphToolBar.setSpacing(10);
+        displayId.setStyle("-fx-max-width: 1000");
+        graphToolBar.setStyle("-fx-background-color:rgb(40, 40, 40)");
+        HBox canvasContainer = new HBox(graphToolBar, graphView.canvas);
+        canvasContainer.setAlignment(Pos.CENTER);
+        graphDataSP.setMinHeight(200);
+        rightBox.getChildren().add(graphDataSP);
+        rightBox.setAlignment(Pos.CENTER);
+        graphData.getStyleClass().add("graph-data");
+        graphData.getChildren().addAll(numVerticesL, numEdgesL);
+        graphDataSP.setContent(graphData);
+        graphDataSP.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        GridPane.setRowIndex(controlBox, 0);
-        GridPane.setRowIndex(graphView.canvas, 0);
+        GridPane.setRowIndex(leftBox, 0);
+        GridPane.setRowIndex(canvasContainer, 0);
+        GridPane.setRowIndex(rightBox, 0);
 
-        GridPane.setColumnIndex(controlBox, 0);
-        GridPane.setColumnIndex(graphView.canvas, 1);
-        GridPane.setVgrow(controlBox, Priority.ALWAYS);
-        GridPane.setVgrow(graphView.canvas, Priority.ALWAYS);
+        canvasContainer.setStyle("-fx-max-height:" + graphView.canvas.getHeight());
+
+        GridPane.setColumnIndex(leftBox, 0);
+        GridPane.setColumnIndex(canvasContainer, 1);
+        GridPane.setColumnIndex(rightBox, 2);
+
+        GridPane.setVgrow(leftBox, Priority.ALWAYS);
         setWidth(Double.MAX_VALUE);
         ColumnConstraints cc1 = new ColumnConstraints();
         ColumnConstraints cc2 = new ColumnConstraints();
@@ -107,13 +146,15 @@ public class Main extends GridPane {
         cc3.setPercentWidth(15);
         getColumnConstraints().addAll(cc1, cc2, cc3);
         setMaxHeight(Double.MAX_VALUE);
-        GridPane.setHalignment(graphView.canvas, HPos.CENTER);
-        getChildren().addAll(controlBox, graphView.canvas);
+
+        getChildren().addAll(leftBox, canvasContainer, rightBox);
         addVertexBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
+
                 graphView.addVertex();
                 vertexList.setAll(graphView.getVertexIds());
+                updateVertexNum();
             }
         });
         removeVertexBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -124,7 +165,8 @@ public class Main extends GridPane {
                     vertexList.setAll(graphView.getVertexIds());
                     edgeList.setAll(graphView.getEdgePairs());
                 }
-
+                updateVertexNum();
+                updateEdgeNum();
             }
         });
         addEdgeBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -141,6 +183,7 @@ public class Main extends GridPane {
                 }
 
                 edgeList.setAll(graphView.getEdgePairs());
+                updateEdgeNum();
             }
         });
         removeEdgeBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -152,9 +195,38 @@ public class Main extends GridPane {
 
                 graphView.removeEdge(id1, id2);
                 edgeList.setAll(graphView.getEdgePairs());
+                updateEdgeNum();
             }
         });
+        layout.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                graphView.generateLayout();
+            }
+        });
+        displayId.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                graphView.toggleDisplayId();
 
+            }
+        });
+        dfs.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                DFS d = new DFS(graphView);
+                d.start();
+
+            }
+        });
+    }
+
+    public void updateVertexNum() {
+        numVerticesL.setText("Number of vertices: " + graphView.vertexList.size());
+    }
+
+    public void updateEdgeNum() {
+        numEdgesL.setText("Number of edges: " + graphView.edgeList.size());
     }
 
 }

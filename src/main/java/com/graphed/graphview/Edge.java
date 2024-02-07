@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package com.graph.graphview;
+package com.graphed.graphview;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -37,6 +37,17 @@ class Edge {
         this.weight = weight;
         this.isWeighted = true;
 
+    }
+
+    // returns the id of the vertex adjacent to the vertex v on the edge
+    public int getAdjacentIfExists(Vertex v) throws Exception {
+        if (v1.equals(v)) {
+            return v2.getId();
+        }
+        if (v2.equals(v)) {
+            return v1.getId();
+        }
+        throw new Exception("This edge doesn't have the v vertex");
     }
 
     public String toString() {

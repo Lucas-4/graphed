@@ -15,9 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package com.graph.graphview;
+package com.graphed.graphview;
 
 import java.util.ArrayList;
+import java.util.Random;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -32,17 +33,21 @@ public class GraphView {
     public Canvas canvas = new Canvas(1000, 800);
     private GraphicsContext gc = canvas.getGraphicsContext2D();
     private Vertex selectedVertex;
+    // scale contant
+    private double scaleK = 1.1;
+    private int scale = 1;
     private Color backgroundColor = Color.rgb(20, 20, 20);
     private boolean isDirected;
     private boolean isWeighted;
     private int vertexIDCounter = 0;
-    public Double lastX;
-    public Double lastY;
+    private Double lastX;
+    private Double lastY;
 
     public GraphView(boolean isDirected, boolean isWeighted) {
         this.isDirected = isDirected;
         this.isWeighted = isWeighted;
-
+        Vertex.radius = 20;
+        Vertex.displayId = true;
         canvas.setOnMousePressed(this::handlePressed);
         canvas.setOnMouseDragged(this::handleDrag);
         canvas.setOnMouseReleased(this::handleRelease);
@@ -52,30 +57,11 @@ public class GraphView {
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
-    // returns the ids of all the vertices in the graph view
-    public ArrayList<Integer> getVertexIds() {
-        ArrayList<Integer> vertexIds = new ArrayList<Integer>();
-        for (int i = 0; i < vertexList.size(); i++) {
-            vertexIds.add(vertexList.get(i).getId());
-        }
-        return vertexIds;
-    }
-
-    public ArrayList<String> getEdgePairs() {
-        ArrayList<String> edgePairs = new ArrayList<String>();
-        for (int i = 0; i < edgeList.size(); i++) {
-            String s = edgeList.get(i).toString();
-            edgePairs.add(s);
-        }
-        return edgePairs;
-    }
-
     public void addVertex() {
-
         Vertex v = new Vertex(vertexIDCounter);
         vertexIDCounter++;
         vertexList.add(v);
-        v.setPos(v.getId() * 50, v.getId() * 50);
+        setRandomPos(v);
         draw();
     }
 
@@ -104,39 +90,27 @@ public class GraphView {
                     return;
                 }
             }
-            // gets the vertices with the specified ids
-            for (int i = 0; i < vertexList.size(); i++) {
-                if (vertexList.get(i).getId() == id1) {
-                    v1 = vertexList.get(i);
-                }
-                if (vertexList.get(i).getId() == id2) {
-                    v2 = vertexList.get(i);
-                }
-            }
+            v1 = getVertexById(id1);
+            v2 = getVertexById(id2);
             edgeList.add(new DirectedEdge(v1, v2));
             draw();
-            return;
+        } else {
+            // checks if edge already exists
+            for (int i = 0; i < edgeList.size(); i++) {
+                if ((edgeList.get(i).v1.getId() == id1 && edgeList.get(i).v2.getId() == id2)
+                        || (edgeList.get(i).v1.getId() == id2 && edgeList.get(i).v2.getId() == id1)) {
+                    return;
+                }
+            }
+            v1 = getVertexById(id1);
+            v2 = getVertexById(id2);
+            edgeList.add(new Edge(v1, v2));
+            draw();
         }
 
-        for (int i = 0; i < edgeList.size(); i++) {
-            if ((edgeList.get(i).v1.getId() == id1 && edgeList.get(i).v2.getId() == id2)
-                    || (edgeList.get(i).v1.getId() == id2 && edgeList.get(i).v2.getId() == id1)) {
-                return;
-            }
-        }
-        for (int i = 0; i < vertexList.size(); i++) {
-            if (vertexList.get(i).getId() == id1) {
-                v1 = vertexList.get(i);
-            }
-            if (vertexList.get(i).getId() == id2) {
-                v2 = vertexList.get(i);
-            }
-        }
-
-        edgeList.add(new Edge(v1, v2));
-        draw();
     }
 
+    // add weighted edge
     public void addEdge(int id1, int id2, double weight) {
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
@@ -149,36 +123,24 @@ public class GraphView {
                 }
             }
             // get the vertices with the specified ids
-            for (int i = 0; i < vertexList.size(); i++) {
-                if (vertexList.get(i).getId() == id1) {
-                    v1 = vertexList.get(i);
-                }
-                if (vertexList.get(i).getId() == id2) {
-                    v2 = vertexList.get(i);
-                }
-            }
+            v1 = getVertexById(id1);
+            v2 = getVertexById(id2);
             edgeList.add(new DirectedEdge(v1, v2, weight));
             draw();
-            return;
+        } else {
+            // checks if edge already exists
+            for (int i = 0; i < edgeList.size(); i++) {
+                if ((edgeList.get(i).v1.getId() == id1 && edgeList.get(i).v2.getId() == id2)
+                        || (edgeList.get(i).v1.getId() == id2 && edgeList.get(i).v2.getId() == id1)) {
+                    return;
+                }
+            }
+            v1 = getVertexById(id1);
+            v2 = getVertexById(id2);
+            edgeList.add(new Edge(v1, v2, weight));
+            draw();
         }
 
-        for (int i = 0; i < edgeList.size(); i++) {
-            if ((edgeList.get(i).v1.getId() == id1 && edgeList.get(i).v2.getId() == id2)
-                    || (edgeList.get(i).v1.getId() == id2 && edgeList.get(i).v2.getId() == id1)) {
-                return;
-            }
-        }
-        for (int i = 0; i < vertexList.size(); i++) {
-            if (vertexList.get(i).getId() == id1) {
-                v1 = vertexList.get(i);
-            }
-            if (vertexList.get(i).getId() == id2) {
-                v2 = vertexList.get(i);
-            }
-        }
-
-        edgeList.add(new Edge(v1, v2, weight));
-        draw();
     }
 
     public void removeEdge(int id1, int id2) {
@@ -190,15 +152,59 @@ public class GraphView {
                 }
             }
             draw();
-            return;
-        }
-        for (int i = 0; i < edgeList.size(); i++) {
-            Edge e = edgeList.get(i);
-            if ((e.v1.getId() == id1 && e.v2.getId() == id2) || (e.v1.getId() == id2 && e.v2.getId() == id1)) {
-                edgeList.remove(i);
+        } else {
+            for (int i = 0; i < edgeList.size(); i++) {
+                Edge e = edgeList.get(i);
+                if ((e.v1.getId() == id1 && e.v2.getId() == id2) || (e.v1.getId() == id2 && e.v2.getId() == id1)) {
+                    edgeList.remove(i);
+                }
             }
+            draw();
+        }
+
+    }
+
+    // returns the ids of all the vertices in the graph view
+    public ArrayList<Integer> getVertexIds() {
+        ArrayList<Integer> vertexIds = new ArrayList<Integer>();
+        for (int i = 0; i < vertexList.size(); i++) {
+            vertexIds.add(vertexList.get(i).getId());
+        }
+        return vertexIds;
+    }
+
+    // returns a list of string representation of the edges
+    public ArrayList<String> getEdgePairs() {
+        ArrayList<String> edgePairs = new ArrayList<String>();
+        for (int i = 0; i < edgeList.size(); i++) {
+            String s = edgeList.get(i).toString();
+            edgePairs.add(s);
+        }
+        return edgePairs;
+    }
+
+    public void setRandomPos(Vertex v) {
+        Random r = new Random();
+        double x = Vertex.radius + r.nextDouble() * (canvas.getWidth() - Vertex.radius * 2);
+        double y = Vertex.radius + r.nextDouble() * (canvas.getHeight() - Vertex.radius * 2);
+        v.setPos(x, y);
+    }
+
+    public void generateLayout() {
+        for (int i = 0; i < vertexList.size(); i++) {
+            Vertex v = vertexList.get(i);
+            setRandomPos(v);
         }
         draw();
+    }
+
+    public Vertex getVertexById(int id) {
+        for (Vertex v : vertexList) {
+            if (v.getId() == id) {
+                return v;
+            }
+        }
+        return null;
     }
 
     // draws the vertices and edges on the canvas
@@ -211,8 +217,8 @@ public class GraphView {
         }
 
         for (int i = 0; i < vertexList.size(); i++) {
-            Vertex v0 = vertexList.get(i);
-            v0.draw(gc);
+            Vertex v = vertexList.get(i);
+            v.draw(gc);
         }
     }
 
@@ -224,8 +230,9 @@ public class GraphView {
         }
         for (int i = 0; i < vertexList.size(); i++) {
             Vertex v = vertexList.get(i);
-            if (arg0.getX() >= v.posX - 20
-                    && arg0.getX() <= v.posX + 20 && arg0.getY() >= v.posY - 20 && arg0.getY() <= v.posY + 20) {
+            if (arg0.getX() >= v.posX - Vertex.radius
+                    && arg0.getX() <= v.posX + Vertex.radius && arg0.getY() >= v.posY - Vertex.radius
+                    && arg0.getY() <= v.posY + Vertex.radius) {
                 selectedVertex = vertexList.get(i);
             }
         }
@@ -275,24 +282,45 @@ public class GraphView {
     }
 
     public void handleScroll(ScrollEvent e) {
+
         double scroll = e.getDeltaY();
         if (scroll < 0) {
-            Vertex.radius /= 1.1;
+            scale -= 1;
+            Vertex.radius /= scaleK;
         } else {
-            Vertex.radius *= 1.1;
+            scale += 1;
+            Vertex.radius *= scaleK;
         }
+        System.out.println(scale);
         for (int i = 0; i < vertexList.size(); i++) {
             Vertex v = vertexList.get(i);
             // zoom out
             if (scroll < 0) {
-                v.posX /= 1.1;
-                v.posY /= 1.1;
+                v.posX /= scaleK;
+                v.posY /= scaleK;
             } else {// zoom in
-                v.posX *= 1.1;
-                v.posY *= 1.1;
+                v.posX *= scaleK;
+                v.posY *= scaleK;
             }
         }
         draw();
     }
 
+    public void toggleDisplayId() {
+        Vertex.displayId = !Vertex.displayId;
+        draw();
+    }
+
+    // returns the ids of the neighbors of the vertex
+    public ArrayList<Integer> neighbors(int id) {
+        ArrayList<Integer> neighbors = new ArrayList<>();
+        for (Edge e : edgeList) {
+            Vertex v = getVertexById(id);
+            try {
+                neighbors.add(e.getAdjacentIfExists(v));
+            } catch (Exception ex) {
+            }
+        }
+        return neighbors;
+    }
 }

@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package com.graph.graphview;
+package com.graphed.graphview;
 
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
@@ -27,12 +27,25 @@ public class Vertex {
     public double posX;
     public double posY;
     public static double radius = 20;
+    public static boolean displayId = true;
+    private Color vColor = Color.rgb(20, 20, 20);
+
+    // variable used for searching
+    public boolean isVisited = false;
 
     public Vertex() {
     }
 
     public Vertex(int id) {
         this.id = id;
+    }
+
+    public void setColor(Color c) {
+        vColor = c;
+    }
+
+    public void setDefaultColor() {
+        vColor = Color.rgb(20, 20, 20);
     }
 
     public int getId() {
@@ -45,18 +58,22 @@ public class Vertex {
     }
 
     public void draw(GraphicsContext gc) {
-
-        gc.setFill(Color.rgb(20, 20, 20));
         gc.beginPath();
-        gc.setLineWidth(3);
         gc.arc(posX, posY, radius, radius, 0, 360);
         gc.closePath();
-        gc.fill();
+
         gc.setStroke(Color.WHITE);
+        gc.setLineWidth(3);
         gc.stroke();
-        // gc.setFill(Color.GREEN);
-        // gc.setTextBaseline(VPos.CENTER);
-        // gc.setTextAlign(TextAlignment.CENTER);
-        // gc.fillText(String.valueOf(id), posX, posY);
+
+        gc.setFill(vColor);
+        gc.fill();
+
+        if (displayId) {
+            gc.setFill(Color.GREEN);
+            gc.setTextBaseline(VPos.CENTER);
+            gc.setTextAlign(TextAlignment.CENTER);
+            gc.fillText(String.valueOf(id), posX, posY);
+        }
     }
 }

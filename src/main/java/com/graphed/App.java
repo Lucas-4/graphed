@@ -1,3 +1,4 @@
+
 /*     
     Copyright (C) 2024  Lucas Dias Borges <diaslucas8822@gmail.com>
 
@@ -14,8 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
-package com.graph;
+package com.graphed;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -31,10 +31,12 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import com.graph.screens.Main;
+
+import com.graphed.screens.Main;
 
 /**
  * JavaFX App
@@ -49,13 +51,13 @@ public class App extends Application {
         BorderPane appPane = new BorderPane();
         appPane.getStyleClass().add("border-pane");
         MenuBar menubar = new MenuBar();
-        Menu menu = new Menu("File");
-        MenuItem mi = new MenuItem("New Project...");
+        Menu fileMenu = new Menu("File");
+        MenuItem newProjectMenuItem = new MenuItem("New Project...");
 
         menubar.setMaxWidth(Double.MAX_VALUE);
 
-        menu.getItems().addAll(mi);
-        menubar.getMenus().add(menu);
+        fileMenu.getItems().addAll(newProjectMenuItem);
+        menubar.getMenus().add(fileMenu);
 
         appPane.setTop(menubar);
 
@@ -66,13 +68,16 @@ public class App extends Application {
         stage.setTitle("Graphed");
         scene.setFill(Color.RED);
         stage.show();
-        mi.setOnAction(new EventHandler<ActionEvent>() {
+        newProjectMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 GridPane popupPane = new GridPane();
                 Stage newProjectStage = new Stage();
+                newProjectStage.initModality(Modality.APPLICATION_MODAL);
                 Scene newProjectScene = new Scene(popupPane);
-                Button createProject = new Button("New Graph");
+                newProjectScene.getStylesheets().add(App.class.getResource("/styles/main.css").toExternalForm());
+
+                Button createProjectBtn = new Button("Create Project");
                 popupPane.setPrefWidth(300);
                 popupPane.setPrefHeight(150);
                 popupPane.setAlignment(Pos.CENTER);
@@ -95,18 +100,20 @@ public class App extends Application {
                 GridPane.setRowIndex(undirected, 1);
                 GridPane.setRowIndex(weighted, 2);
                 GridPane.setRowIndex(unweighted, 3);
-                GridPane.setRowIndex(createProject, 4);
+                GridPane.setRowIndex(createProjectBtn, 4);
 
-                popupPane.getChildren().addAll(directed, undirected, weighted, unweighted, createProject);
+                popupPane.getChildren().addAll(directed, undirected, weighted, unweighted, createProjectBtn);
                 newProjectStage.setScene(newProjectScene);
-                createProject.setOnAction(new EventHandler<ActionEvent>() {
+
+                createProjectBtn.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e) {
-                        newProjectStage.close();
+
                         mainScreen = new Main(isDirected.getSelectedToggle().equals(directed),
                                 isWeighted.getSelectedToggle().equals(weighted));
 
                         appPane.setCenter(mainScreen);
+                        newProjectStage.close();
                     }
                 });
                 newProjectStage.showAndWait();

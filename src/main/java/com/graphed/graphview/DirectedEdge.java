@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package com.graph.graphview;
+package com.graphed.graphview;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -27,6 +27,16 @@ public class DirectedEdge extends Edge {
 
     public DirectedEdge(Vertex v1, Vertex v2, double weight) {
         super(v1, v2, weight);
+    }
+
+    // returns the id of the vertex adjacent to the vertex v on the edge
+    public int getAdjacentIfExists(Vertex v) throws Exception {
+
+        if (v1.equals(v)) {
+            return v2.getId();
+        }
+        throw new Exception(
+                "This edge doesn't have the v vertex or the vertex v doesn't have an adjacent in this edge");
     }
 
     @Override

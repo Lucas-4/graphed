@@ -1,9 +1,9 @@
-module com.graph {
+module com.graphed {
     requires javafx.controls;
     requires javafx.fxml;
     requires transitive javafx.graphics;
 
-    opens com.graph to javafx.fxml;
+    opens com.graphed to javafx.fxml;
 
-    exports com.graph;
+    exports com.graphed;
 }

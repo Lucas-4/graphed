@@ -1,49 +1,74 @@
-.root{
+.root {
     -fx-main-color: rgb(20, 20, 20);
 }
-.menu-bar{
-    -fx-background-color: #4CAF50;
+.menu-bar {
+    -fx-background-color: #4caf50;
 }
-VBox{
+
+.button {
+    -fx-cursor: hand;
+}
+
+VBox {
     -fx-background-color: -fx-main-color;
-    -fx-max-width:200;
 }
+
 .list-view {
     -fx-background-color: -fx-main-color;
-    -fx-border-color:rgb(243, 243, 243);
-    -fx-border-width:1;
+    -fx-border-color: rgb(243, 243, 243);
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-max-height: 300;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: -fx-main-color;
+}
+.scroll-pane {
+    -fx-background-color: -fx-main-color;
+
+    -fx-border-color: rgb(243, 243, 243);
+    -fx-border-width: 1;
     -fx-border-radius: 3;
     -fx-max-height: 300;
 }
 
-.list-view .list-cell{
+.list-view .list-cell {
     -fx-background-color: -fx-main-color;
-    -fx-text-fill:rgb(255, 255, 255);
+    -fx-text-fill: rgb(255, 255, 255);
 }
 
-.list-view .list-cell:selected{
-    -fx-background-color: #4CAF50 ;
+.list-view .list-cell:selected {
+    -fx-background-color: #4caf50;
     -fx-text-fill: -fx-main-color;
 }
-.scroll-bar{
-    -fx-color:rgb(119, 119, 119);
+.scroll-bar {
+    -fx-color: rgb(119, 119, 119);
     -fx-background-color: -fx-main-color;
 }
 
-.button, .combo-box-base, .text-field{
+.button,
+.combo-box-base,
+.text-field {
     -fx-background-color: rgb(57, 57, 57);
     -fx-text-fill: rgb(223, 223, 223);
-    
 }
 
-.text-field{
-    -fx-max-width:100;
+.text-field {
+    -fx-max-width: 100;
 }
 
-.combo-box .list-cell{
-    -fx-text-fill:rgb(223, 223, 223);
+.combo-box .list-cell {
+    -fx-text-fill: rgb(223, 223, 223);
 }
 
-.border-pane{
-    -fx-background-color:rgb(49, 49, 49);
-} 
+.border-pane {
+    -fx-background-color: rgb(49, 49, 49);
+}
+.graph-data {
+    -fx-spacing: 5;
+}
+.graph-data .label {
+    -fx-text-fill: rgb(223, 223, 223);
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}

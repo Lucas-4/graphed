@@ -13,7 +13,7 @@ Graphed is a simple graph visualization application built using JavaFX
 * Save and load graphs
 * Implement and visualize various graph algorithms
 * Graph metrics
-* Implement graph drawing algoritmhs
+* Implement graph drawing algorithms
 * And more...
 
 ## Requirements
