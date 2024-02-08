@@ -30,13 +30,12 @@ public class DirectedEdge extends Edge {
     }
 
     // returns the id of the vertex adjacent to the vertex v on the edge
-    public int getAdjacentIfExists(Vertex v) throws Exception {
+    public Integer getAdjacentIfExists(Vertex v) {
 
         if (v1.equals(v)) {
             return v2.getId();
         }
-        throw new Exception(
-                "This edge doesn't have the v vertex or the vertex v doesn't have an adjacent in this edge");
+        return null;
     }
 
     @Override

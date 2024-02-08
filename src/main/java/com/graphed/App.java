@@ -31,11 +31,14 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 
+import com.graphed.graphview.GraphView;
 import com.graphed.screens.Main;
 
 /**
@@ -52,11 +55,14 @@ public class App extends Application {
         appPane.getStyleClass().add("border-pane");
         MenuBar menubar = new MenuBar();
         Menu fileMenu = new Menu("File");
+
+        MenuItem save = new MenuItem("Save...");
+        MenuItem open = new MenuItem("Open...");
         MenuItem newProjectMenuItem = new MenuItem("New Project...");
 
         menubar.setMaxWidth(Double.MAX_VALUE);
 
-        fileMenu.getItems().addAll(newProjectMenuItem);
+        fileMenu.getItems().addAll(newProjectMenuItem, save, open);
         menubar.getMenus().add(fileMenu);
 
         appPane.setTop(menubar);
@@ -68,6 +74,39 @@ public class App extends Application {
         stage.setTitle("Graphed");
         scene.setFill(Color.RED);
         stage.show();
+        save.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                try {
+                    FileChooser fc = new FileChooser();
+                    fc.setTitle("Save");
+                    File file = fc.showSaveDialog(stage);
+                    if (file != null) {
+                        mainScreen.save(file);
+                    }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+        });
+        open.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                try {
+                    FileChooser fc = new FileChooser();
+                    fc.setTitle("Open");
+
+                    File file = fc.showOpenDialog(stage);
+                    mainScreen = new Main(new GraphView(file));
+                    appPane.setCenter(mainScreen);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+        });
         newProjectMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -111,7 +150,6 @@ public class App extends Application {
 
                         mainScreen = new Main(isDirected.getSelectedToggle().equals(directed),
                                 isWeighted.getSelectedToggle().equals(weighted));
-
                         appPane.setCenter(mainScreen);
                         newProjectStage.close();
                     }

@@ -17,6 +17,11 @@
 
 package com.graphed.graphview;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -75,5 +80,33 @@ public class Vertex {
             gc.setTextAlign(TextAlignment.CENTER);
             gc.fillText(String.valueOf(id), posX, posY);
         }
+    }
+
+    public byte[] toByteArray() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+
+        try {
+
+            dos.writeInt(id);
+            dos.writeDouble(posX);
+            dos.writeDouble(posY);
+
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return baos.toByteArray();
+    }
+
+    public Vertex fromByteArray(DataInputStream dis) {
+        Vertex v = new Vertex();
+        try {
+            v.id = dis.readInt();
+            v.posX = dis.readDouble();
+            v.posY = dis.readDouble();
+        } catch (Exception e) {
+        }
+        return v;
+
     }
 }

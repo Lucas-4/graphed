@@ -17,6 +17,11 @@
 
 package com.graphed.graphview;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 import javafx.scene.Cursor;
@@ -37,8 +42,8 @@ public class GraphView {
     private double scaleK = 1.1;
     private int scale = 1;
     private Color backgroundColor = Color.rgb(20, 20, 20);
-    private boolean isDirected;
-    private boolean isWeighted;
+    public boolean isDirected;
+    public boolean isWeighted;
     private int vertexIDCounter = 0;
     private Double lastX;
     private Double lastY;
@@ -48,6 +53,17 @@ public class GraphView {
         this.isWeighted = isWeighted;
         Vertex.radius = 20;
         Vertex.displayId = true;
+        canvas.setOnMousePressed(this::handlePressed);
+        canvas.setOnMouseDragged(this::handleDrag);
+        canvas.setOnMouseReleased(this::handleRelease);
+        canvas.setOnMouseMoved(this::handleMove);
+        canvas.setOnScroll(this::handleScroll);
+        gc.setFill(backgroundColor);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+    }
+
+    public GraphView(File file) {
+        createFromFile(file);
         canvas.setOnMousePressed(this::handlePressed);
         canvas.setOnMouseDragged(this::handleDrag);
         canvas.setOnMouseReleased(this::handleRelease);
@@ -316,11 +332,77 @@ public class GraphView {
         ArrayList<Integer> neighbors = new ArrayList<>();
         for (Edge e : edgeList) {
             Vertex v = getVertexById(id);
-            try {
-                neighbors.add(e.getAdjacentIfExists(v));
-            } catch (Exception ex) {
+            Integer adjacent = e.getAdjacentIfExists(v);
+            if (adjacent != null) {
+                neighbors.add(adjacent);
             }
+
         }
         return neighbors;
+    }
+
+    // save graph to file
+    public void save(File file) {
+        try {
+            file.createNewFile();
+            FileOutputStream fos = new FileOutputStream(file);
+            DataOutputStream dos = new DataOutputStream(fos);
+            dos.writeBoolean(isDirected);
+            dos.writeBoolean(isWeighted);
+            dos.writeInt(vertexIDCounter);
+            dos.writeDouble(Vertex.radius);
+            dos.writeInt(vertexList.size());
+            for (Vertex v : vertexList) {
+                dos.write(v.toByteArray());
+            }
+            dos.writeInt(edgeList.size());
+            for (Edge e : edgeList) {
+                dos.write(e.toByteArray());
+            }
+            dos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createFromFile(File file) {
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            DataInputStream dis = new DataInputStream(fis);
+            isDirected = dis.readBoolean();
+            isWeighted = dis.readBoolean();
+            vertexIDCounter = dis.readInt();
+            Vertex.radius = dis.readDouble();
+            int vertexNum = dis.readInt();
+            vertexList = new ArrayList<Vertex>();
+            for (int i = 0; i < vertexNum; i++) {
+                vertexList.add(new Vertex().fromByteArray(dis));
+            }
+            int edgeNum = dis.readInt();
+            edgeList = new ArrayList<Edge>();
+            for (int i = 0; i < edgeNum; i++) {
+                int v1id, v2id;
+                v1id = dis.readInt();
+                v2id = dis.readInt();
+                if (isWeighted) {
+                    double weight = dis.readDouble();
+                    if (isDirected) {
+                        edgeList.add(new DirectedEdge(getVertexById(v1id), getVertexById(v2id), weight));
+                    } else {
+                        edgeList.add(new Edge(getVertexById(v1id), getVertexById(v2id), weight));
+                    }
+                } else {
+                    if (isDirected) {
+                        edgeList.add(new DirectedEdge(getVertexById(v1id), getVertexById(v2id)));
+                    } else {
+                        edgeList.add(new Edge(getVertexById(v1id), getVertexById(v2id)));
+                    }
+                }
+
+            }
+            dis.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

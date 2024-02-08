@@ -17,6 +17,8 @@
 
 package com.graphed.screens;
 
+import java.io.File;
+
 import com.graphed.graphview.GraphView;
 import com.graphed.graphview.search.DFS;
 
@@ -69,8 +71,8 @@ public class Main extends GridPane {
 
     private VBox rightBox = new VBox();
     private ScrollPane graphDataSP = new ScrollPane();
-    private Label numVerticesL = new Label("Number of vertices: 0");
-    private Label numEdgesL = new Label("Number of edges: 0");
+    private Label numVerticesL = new Label();
+    private Label numEdgesL = new Label();
     private VBox graphData = new VBox();
 
     public Main(
@@ -78,9 +80,21 @@ public class Main extends GridPane {
             boolean isWeighted) {
         this.isDirected = isDirected;
         this.isWeighted = isWeighted;
-
         graphView = new GraphView(isDirected, isWeighted);
+        build();
+    }
 
+    public Main(GraphView gv) {
+        graphView = gv;
+        this.isDirected = graphView.isDirected;
+        this.isWeighted = graphView.isWeighted;
+        gv.draw();
+        build();
+    }
+
+    private void build() {
+        updateVertexNumLabel();
+        updateEdgeNumLabel();
         vertexList = FXCollections.observableArrayList(graphView.getVertexIds());
         vertexListView = new ListView<Integer>(vertexList);
 
@@ -154,7 +168,7 @@ public class Main extends GridPane {
 
                 graphView.addVertex();
                 vertexList.setAll(graphView.getVertexIds());
-                updateVertexNum();
+                updateVertexNumLabel();
             }
         });
         removeVertexBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -165,8 +179,8 @@ public class Main extends GridPane {
                     vertexList.setAll(graphView.getVertexIds());
                     edgeList.setAll(graphView.getEdgePairs());
                 }
-                updateVertexNum();
-                updateEdgeNum();
+                updateVertexNumLabel();
+                updateEdgeNumLabel();
             }
         });
         addEdgeBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -183,7 +197,7 @@ public class Main extends GridPane {
                 }
 
                 edgeList.setAll(graphView.getEdgePairs());
-                updateEdgeNum();
+                updateEdgeNumLabel();
             }
         });
         removeEdgeBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -195,7 +209,7 @@ public class Main extends GridPane {
 
                 graphView.removeEdge(id1, id2);
                 edgeList.setAll(graphView.getEdgePairs());
-                updateEdgeNum();
+                updateEdgeNumLabel();
             }
         });
         layout.setOnAction(new EventHandler<ActionEvent>() {
@@ -219,14 +233,18 @@ public class Main extends GridPane {
 
             }
         });
+
     }
 
-    public void updateVertexNum() {
+    public void updateVertexNumLabel() {
         numVerticesL.setText("Number of vertices: " + graphView.vertexList.size());
     }
 
-    public void updateEdgeNum() {
+    public void updateEdgeNumLabel() {
         numEdgesL.setText("Number of edges: " + graphView.edgeList.size());
     }
 
+    public void save(File file) {
+        graphView.save(file);
+    }
 }

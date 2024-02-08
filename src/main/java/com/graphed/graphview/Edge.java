@@ -17,6 +17,11 @@
 
 package com.graphed.graphview;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -39,15 +44,18 @@ class Edge {
 
     }
 
+    public Edge() {
+    }
+
     // returns the id of the vertex adjacent to the vertex v on the edge
-    public int getAdjacentIfExists(Vertex v) throws Exception {
+    public Integer getAdjacentIfExists(Vertex v) {
         if (v1.equals(v)) {
             return v2.getId();
         }
         if (v2.equals(v)) {
             return v1.getId();
         }
-        throw new Exception("This edge doesn't have the v vertex");
+        return null;
     }
 
     public String toString() {
@@ -62,6 +70,22 @@ class Edge {
         gc.setStroke(Color.RED);
         gc.setLineWidth(3);
         gc.strokeLine(v1.posX, v1.posY, v2.posX, v2.posY);
+    }
+
+    public byte[] toByteArray() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+
+        try {
+            dos.writeInt(v1.getId());
+            dos.writeInt(v2.getId());
+            if (isWeighted) {
+                dos.writeDouble(weight);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return baos.toByteArray();
     }
 
 }
