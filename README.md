@@ -7,13 +7,15 @@ Graphed is a simple graph visualization application built using JavaFX
 * Add and delete edges and vertices on the graph, with support for undirected, directed, unweighted and weighted edges
 * Move vertices on the graph
 * Zoom in/out and move the graph for better visualization
-* Run and visualize the depth-first search algorithm
+* Save and load graphs
+* Depth-first search algorithm visualization
+* Basic graph metrics
+* Change the layout of the graph (randomly, not using any specific algorithm)
 
 ## Upcoming Features
 
-* Save and load graphs
 * Implement and visualize various graph algorithms
-* Graph metrics
+* Advanced graph metrics
 * Implement graph drawing algorithms
 * And more...
 
