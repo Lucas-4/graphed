@@ -43,19 +43,23 @@ public class DirectedEdge extends Edge {
         gc.setStroke(Color.RED);
         gc.setLineWidth(3);
         gc.strokeLine(v1.posX, v1.posY, v2.posX, v2.posY);
+
+        // calculates the intersection point of the edge and the border of the vertex
         double X = v2.posX - v1.posX;
         double Y = v2.posY - v1.posY;
         double XY = Math.pow(X, 2) + Math.pow(Y, 2);
         double H = Math.sqrt(XY);
         double x = Vertex.radius * X / H;
         double y = Vertex.radius * Y / H;
-        double pointx, pointy;
-        pointx = v2.posX - x;
-        pointy = v2.posY - y;
+        double intersectionX, intersectionY;
+        intersectionX = v2.posX - x;
+        intersectionY = v2.posY - y;
+
+        // draws a green circle to indicatethe direction of the edge
         gc.setFill(Color.GREEN);
         gc.beginPath();
         gc.setLineWidth(2.5);
-        gc.arc(pointx, pointy, 7, 7, 0, 360);
+        gc.arc(intersectionX, intersectionY, 7, 7, 0, 360);
         gc.closePath();
         gc.fill();
     }
