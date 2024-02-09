@@ -55,7 +55,7 @@ public class DirectedEdge extends Edge {
         intersectionX = v2.posX - x;
         intersectionY = v2.posY - y;
 
-        // draws a green circle to indicatethe direction of the edge
+        // draws a green circle to indicate the direction of the edge
         gc.setFill(Color.GREEN);
         gc.beginPath();
         gc.setLineWidth(2.5);
