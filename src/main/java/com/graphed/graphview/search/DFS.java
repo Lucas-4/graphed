@@ -29,7 +29,7 @@ public class DFS extends Thread {
     }
 
     public void run() {
-        visit(0);
+        visit(gv.vertexList.get(0).getId());
         wait(1000);
         for (int i = 0; i < gv.vertexList.size(); i++) {
             gv.vertexList.get(i).setDefaultColor();
@@ -37,20 +37,21 @@ public class DFS extends Thread {
         gv.draw();
     }
 
-    private void visit(int u) {
-        gv.vertexList.get(vertexMap.get(u)).isVisited = true;
+    // visits a vertex
+    private void visit(int id) {
+        gv.vertexList.get(vertexMap.get(id)).isVisited = true;
         wait(1000);
-        gv.vertexList.get(vertexMap.get(u)).setColor(Color.RED);
+        gv.vertexList.get(vertexMap.get(id)).setColor(Color.RED);
         gv.draw();
 
-        for (Integer w : gv.neighbors(u)) {
+        for (Integer w : gv.neighbors(id)) {
             if (!gv.vertexList.get(vertexMap.get(w)).isVisited) {
                 visit(w);
             }
         }
 
         wait(1000);
-        gv.vertexList.get(vertexMap.get(u)).setColor(Color.PURPLE);
+        gv.vertexList.get(vertexMap.get(id)).setColor(Color.PURPLE);
         gv.draw();
 
     }
