@@ -43,3 +43,5 @@ cd graphed
 ```
 mvn clean javafx:run
 ```
+
+The repository has an "example" file, you can open this file to view an example of a graph. Open the app, go to File -> Open and locate the "example" file
