@@ -20,8 +20,7 @@ package com.graphed.screens;
 import java.io.File;
 
 import com.graphed.graphview.GraphView;
-import com.graphed.graphview.search.DFS;
-
+import com.graphed.graphview.animation.AnimationManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -33,8 +32,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -42,33 +39,44 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class Main extends GridPane {
-    private GraphView graphView;
+    // GraphView
+    public GraphView graphView;
+    private boolean isDirected;
+    private boolean isWeighted;
 
+    // Vertices
     private ObservableList<Integer> vertexList;
     private ListView<Integer> vertexListView;
 
+    // Edges
     private ObservableList<String> edgeList;
     private ListView<String> edgeListView;
 
+    // Left Pane
     private VBox leftBox = new VBox();
     private Button addVertexBtn = new Button("Add Vertex");
     private Button removeVertexBtn = new Button("Remove Vertex");
     private Button addEdgeBtn = new Button("Add Edge");
     private Button removeEdgeBtn = new Button("Remove Edge");
-
     private HBox edgeData = new HBox();
     private HBox edgeBtns = new HBox();
     private HBox vertexBtns = new HBox();
-    private ComboBox<Integer> verticesCB1 = new ComboBox<Integer>();
-    private ComboBox<Integer> verticesCB2 = new ComboBox<Integer>();
+    private ComboBox<Integer> verticesCB1 = new ComboBox<>();
+    private ComboBox<Integer> verticesCB2 = new ComboBox<>();
     private TextField weightTF = new TextField();
-    private boolean isDirected;
-    private boolean isWeighted;
-    private Button layout = new Button();
+
+    // Middle Pane
+    private VBox canvasContainer = new VBox();
+    private Button layout = new Button("CL");
     private Button displayId = new Button("D");
     private Button dfs = new Button("DFS");
-    private VBox graphToolBar = new VBox();
+    private HBox graphToolBar = new HBox();
 
+    private ComboBox<String> animations = new ComboBox<String>();
+
+    private HBox graphToolBar2 = new HBox();
+
+    // Right Pane
     private VBox rightBox = new VBox();
     private ScrollPane graphDataSP = new ScrollPane();
     private Label numVerticesL = new Label();
@@ -121,17 +129,7 @@ public class Main extends GridPane {
         leftBox.getChildren().addAll(vertexListView, vertexBtns, edgeListView, edgeData,
                 edgeBtns);
         leftBox.setPrefWidth(200);
-        Image img = new Image(Main.class.getResource("/images/chart-simple-solid.png").toExternalForm());
-        ImageView view = new ImageView(img);
-        view.setFitWidth(20);
-        view.setPreserveRatio(true);
-        this.layout.setGraphic(view);
-        graphToolBar.getChildren().addAll(layout, displayId, dfs);
-        graphToolBar.setSpacing(10);
-        displayId.setStyle("-fx-max-width: 1000");
-        graphToolBar.setStyle("-fx-background-color:rgb(40, 40, 40)");
-        HBox canvasContainer = new HBox(graphToolBar, graphView.canvas);
-        canvasContainer.setAlignment(Pos.CENTER);
+
         graphDataSP.setMinHeight(200);
         rightBox.getChildren().add(graphDataSP);
         rightBox.setAlignment(Pos.CENTER);
@@ -140,16 +138,27 @@ public class Main extends GridPane {
         graphDataSP.setContent(graphData);
         graphDataSP.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
+        graphToolBar.getChildren().addAll(layout, displayId, dfs);
+        graphToolBar.setSpacing(10);
+        graphToolBar.setStyle("-fx-background-color:rgb(40, 40, 40)");
+        graphToolBar.setMaxWidth(graphView.canvas.getWidth());
+
+        AnimationManager am = new AnimationManager(graphView);
+        graphToolBar2.getChildren().addAll(am.getControls());
+        graphToolBar2.setSpacing(10);
+        graphToolBar2.setStyle("-fx-background-color:rgb(40, 40, 40)");
+        graphToolBar2.setMaxWidth(graphView.canvas.getWidth());
+
+        canvasContainer.setAlignment(Pos.CENTER);
+        canvasContainer.setStyle("-fx-background-color:49, 49, 49");
+        canvasContainer.getChildren().setAll(graphToolBar, graphView.canvas, graphToolBar2);
+
         GridPane.setRowIndex(leftBox, 0);
         GridPane.setRowIndex(canvasContainer, 0);
         GridPane.setRowIndex(rightBox, 0);
-
-        canvasContainer.setStyle("-fx-max-height:" + graphView.canvas.getHeight());
-
         GridPane.setColumnIndex(leftBox, 0);
         GridPane.setColumnIndex(canvasContainer, 1);
         GridPane.setColumnIndex(rightBox, 2);
-
         GridPane.setVgrow(leftBox, Priority.ALWAYS);
         setWidth(Double.MAX_VALUE);
         ColumnConstraints cc1 = new ColumnConstraints();
@@ -160,8 +169,8 @@ public class Main extends GridPane {
         cc3.setPercentWidth(15);
         getColumnConstraints().addAll(cc1, cc2, cc3);
         setMaxHeight(Double.MAX_VALUE);
-
         getChildren().addAll(leftBox, canvasContainer, rightBox);
+
         addVertexBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -222,15 +231,6 @@ public class Main extends GridPane {
             @Override
             public void handle(ActionEvent e) {
                 graphView.toggleDisplayId();
-
-            }
-        });
-        dfs.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                DFS d = new DFS(graphView);
-                d.start();
-
             }
         });
 
