@@ -1,6 +1,8 @@
 # Graphed
 
 Graphed is a simple graph visualization application built using JavaFX
+![Graphed 2_18_2024 4_15_34 PM](https://github.com/Lucas-4/graphed/assets/96730880/ab8d489f-a61d-4ace-afee-9958f41f3d42)
+
 
 ## Features
 
