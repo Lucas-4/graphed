@@ -24,6 +24,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -33,8 +36,8 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 
 public class GraphView {
-    public ArrayList<Edge> edgeList = new ArrayList<>();
-    public ArrayList<Vertex> vertexList = new ArrayList<>();
+    public ObservableList<Edge> edgeList = FXCollections.observableArrayList();
+    public ObservableList<Vertex> vertexList = FXCollections.observableArrayList();
     public Canvas canvas = new Canvas(1000, 800);
     private GraphicsContext gc = canvas.getGraphicsContext2D();
     private Vertex selectedVertex;
@@ -374,12 +377,12 @@ public class GraphView {
             vertexIDCounter = dis.readInt();
             Vertex.radius = dis.readDouble();
             int vertexNum = dis.readInt();
-            vertexList = new ArrayList<Vertex>();
+            vertexList = FXCollections.observableArrayList();
             for (int i = 0; i < vertexNum; i++) {
                 vertexList.add(new Vertex().fromByteArray(dis));
             }
             int edgeNum = dis.readInt();
-            edgeList = new ArrayList<Edge>();
+            edgeList = FXCollections.observableArrayList();
             for (int i = 0; i < edgeNum; i++) {
                 int v1id, v2id;
                 v1id = dis.readInt();
