@@ -20,9 +20,9 @@ package com.graphed.screens;
 import java.io.File;
 
 import com.graphed.graphview.GraphView;
+import com.graphed.graphview.Vertex;
+import com.graphed.graphview.Edge;
 import com.graphed.graphview.animation.AnimationManager;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -45,12 +45,10 @@ public class Main extends GridPane {
     private boolean isWeighted;
 
     // Vertices
-    private ObservableList<Integer> vertexList;
-    private ListView<Integer> vertexListView;
+    private ListView<Vertex> vertexListView;
 
     // Edges
-    private ObservableList<String> edgeList;
-    private ListView<String> edgeListView;
+    private ListView<Edge> edgeListView;
 
     // Left Pane
     private VBox leftBox = new VBox();
@@ -61,8 +59,8 @@ public class Main extends GridPane {
     private HBox edgeData = new HBox();
     private HBox edgeBtns = new HBox();
     private HBox vertexBtns = new HBox();
-    private ComboBox<Integer> verticesCB1 = new ComboBox<>();
-    private ComboBox<Integer> verticesCB2 = new ComboBox<>();
+    private ComboBox<Vertex> verticesCB1 = new ComboBox<>();
+    private ComboBox<Vertex> verticesCB2 = new ComboBox<>();
     private TextField weightTF = new TextField();
 
     // Middle Pane
@@ -103,19 +101,17 @@ public class Main extends GridPane {
     private void build() {
         updateVertexNumLabel();
         updateEdgeNumLabel();
-        vertexList = FXCollections.observableArrayList(graphView.getVertexIds());
-        vertexListView = new ListView<Integer>(vertexList);
+        vertexListView = new ListView<>(graphView.vertexList);
 
         vertexBtns.setMaxWidth(Double.MAX_VALUE);
         vertexBtns.setSpacing(10);
         vertexBtns.getChildren().addAll(addVertexBtn, removeVertexBtn);
 
-        edgeList = FXCollections.observableArrayList(graphView.getEdgePairs());
-        edgeListView = new ListView<String>(edgeList);
+        edgeListView = new ListView<>(graphView.edgeList);
 
-        verticesCB1.setItems(vertexList);
+        verticesCB1.setItems(graphView.vertexList);
 
-        verticesCB2.setItems(vertexList);
+        verticesCB2.setItems(graphView.vertexList);
         edgeData.setSpacing(10);
         edgeData.getChildren().addAll(verticesCB1, verticesCB2);
         if (isWeighted) {
@@ -176,7 +172,6 @@ public class Main extends GridPane {
             public void handle(ActionEvent e) {
 
                 graphView.addVertex();
-                vertexList.setAll(graphView.getVertexIds());
                 updateVertexNumLabel();
             }
         });
@@ -184,9 +179,7 @@ public class Main extends GridPane {
             @Override
             public void handle(ActionEvent event) {
                 if (vertexListView.getSelectionModel().getSelectedItem() != null) {
-                    graphView.removeVertex(vertexListView.getSelectionModel().getSelectedItem());
-                    vertexList.setAll(graphView.getVertexIds());
-                    edgeList.setAll(graphView.getEdgePairs());
+                    graphView.removeVertex(vertexListView.getSelectionModel().getSelectedItem().getId());
                 }
                 updateVertexNumLabel();
                 updateEdgeNumLabel();
@@ -196,8 +189,8 @@ public class Main extends GridPane {
             @Override
             public void handle(ActionEvent event) {
                 int id1, id2;
-                id1 = verticesCB1.getSelectionModel().getSelectedItem();
-                id2 = verticesCB2.getSelectionModel().getSelectedItem();
+                id1 = verticesCB1.getSelectionModel().getSelectedItem().getId();
+                id2 = verticesCB2.getSelectionModel().getSelectedItem().getId();
                 if (isWeighted) {
                     double edgeWeight = Double.parseDouble(weightTF.getCharacters().toString());
                     graphView.addEdge(id1, id2, edgeWeight);
@@ -205,7 +198,6 @@ public class Main extends GridPane {
                     graphView.addEdge(id1, id2);
                 }
 
-                edgeList.setAll(graphView.getEdgePairs());
                 updateEdgeNumLabel();
             }
         });
@@ -217,7 +209,6 @@ public class Main extends GridPane {
                 int id2 = Integer.parseInt(s[1].split("w:")[0].trim());
 
                 graphView.removeEdge(id1, id2);
-                edgeList.setAll(graphView.getEdgePairs());
                 updateEdgeNumLabel();
             }
         });
