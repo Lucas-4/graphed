@@ -17,11 +17,9 @@
 
 package com.graphed.graphview;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -55,6 +53,11 @@ public class Vertex {
 
     public int getId() {
         return this.id;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(this.id);
     }
 
     public void setPos(double posX, double posY) {
