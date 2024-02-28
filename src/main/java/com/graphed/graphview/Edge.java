@@ -17,15 +17,12 @@
 
 package com.graphed.graphview;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-class Edge {
+public class Edge {
 
     public boolean isWeighted;
     public double weight;
