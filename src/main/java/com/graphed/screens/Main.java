@@ -67,7 +67,6 @@ public class Main extends GridPane {
     private VBox canvasContainer = new VBox();
     private Button layout = new Button("CL");
     private Button displayId = new Button("D");
-    private Button dfs = new Button("DFS");
     private HBox graphToolBar = new HBox();
 
     private ComboBox<String> animations = new ComboBox<String>();
@@ -134,7 +133,7 @@ public class Main extends GridPane {
         graphDataSP.setContent(graphData);
         graphDataSP.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        graphToolBar.getChildren().addAll(layout, displayId, dfs);
+        graphToolBar.getChildren().addAll(layout, displayId);
         graphToolBar.setSpacing(10);
         graphToolBar.setStyle("-fx-background-color:rgb(40, 40, 40)");
         graphToolBar.setMaxWidth(graphView.canvas.getWidth());
